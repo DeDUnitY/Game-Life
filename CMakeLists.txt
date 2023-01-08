@@ -17,6 +17,8 @@ include_directories("ext/SFML/include/")	# добавляем директори
 include_directories("inc/")
 link_directories("ext/SFML/lib/")	
 
+file(COPY font.ttf DESTINATION "/")
+
 add_executable("${PROJECT_NAME}" main.cpp
 		
 )
