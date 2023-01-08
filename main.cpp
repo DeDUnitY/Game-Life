@@ -1,4 +1,4 @@
-﻿#include <SFML/Graphics.hpp>
+#include <SFML/Graphics.hpp>
 #include <iostream>
 #include <chrono>
 #include <thread>
@@ -14,7 +14,7 @@ int main()
 {
     srand(time(NULL));
     X_Y window_size = {600,600 };
-    X_Y block_size = { 20,20 };
+    X_Y block_size = { 10,10 };
     sf::RenderWindow window(sf::VideoMode(window_size.x, window_size.y), "Life Game");
     window.setFramerateLimit(5);
     sf::RectangleShape shape(sf::Vector2f(block_size.x, block_size.y));
@@ -24,6 +24,15 @@ int main()
     sf::RectangleShape gridy(sf::Vector2f(2, window_size.y));
     gridy.setFillColor(sf::Color(130, 130, 130));
     int temp = 0;
+    sf::Font font;
+    font.loadFromFile("font.ttf");
+    sf::Text Count;
+    Count.setFont(font);
+    Count.setString("\"SPACE\" - pause(Draw Mode)\n\"Left Mouse Button\" - Delite block\n\"Right Mouse Button\" - Create block\n\"R\" - Restart\n\"C\" - Clear");
+    Count.setCharacterSize(40);
+    Count.setPosition(window_size.x / 2-250, window_size.y / 2-150);
+    Count.setStyle(sf::Text::Bold);
+    Count.setColor(sf::Color::White);
     std::vector<std::vector<int>> lifes;
     lifes.resize(window_size.x/block_size.x + 2);
     for (int i = 0; i < lifes.size(); i++) {
@@ -45,7 +54,20 @@ int main()
         lifesT[i].resize(window_size.y / block_size.y + 2);
     }
 
-    bool flag_stop = false;
+    bool flag_stop = true;
+    while (flag_stop && window.isOpen())
+    {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed)
+                window.close();
+            if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Space))
+                flag_stop = false;
+            
+        }
+        window.draw(Count);
+        window.display();
+    }
 
     while (window.isOpen())
     {
@@ -72,11 +94,15 @@ int main()
                 }
             }
         }
-        if (event.mouseButton.button == 1) {
-            lifes[event.mouseButton.x / block_size.x + 1][event.mouseButton.y / block_size.y + 1] = 1;
-        }
-        if (event.mouseButton.button == 0) {
-            lifes[event.mouseButton.x / block_size.x + 1][event.mouseButton.y / block_size.y + 1] = 0;
+        if (0 < event.mouseButton.x / block_size.x + 1 && 0 < event.mouseButton.y / block_size.y + 1 ) {
+            std::cout << event.mouseButton.x << std::endl;
+            if (event.mouseButton.button == 1) {
+                lifes[event.mouseButton.x / block_size.x + 1][event.mouseButton.y / block_size.y + 1] = 1;
+            }
+            if (event.mouseButton.button == 0) {
+                std::cout << event.mouseButton.x << std::endl;
+                lifes[event.mouseButton.x / block_size.x + 1][event.mouseButton.y / block_size.y + 1] = 0;
+            }
         }
         
         if (!flag_stop) {
@@ -101,11 +127,13 @@ int main()
                     }
                 }
             }
+            if (block_size.y > 3)
             for (int i = 0; i < window_size.x/block_size.x+1; i++) {
                 gridy.setPosition(i * block_size.x-1, 0);
                 window.draw(gridy);
                 
             }
+            if (block_size.x > 3)
             for (int i = 0; i < window_size.y / block_size.y + 1; i++) {
                 gridx.setPosition(0, i * block_size.y - 1);
                 window.draw(gridx);
