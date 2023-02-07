@@ -1,4 +1,4 @@
-#include <SFML/Graphics.hpp>
+﻿#include <SFML/Graphics.hpp>
 #include <iostream>
 #include <chrono>
 #include <thread>
@@ -13,8 +13,21 @@ struct X_Y
 int main()
 {
     srand(time(NULL));
-    X_Y window_size = {600,600 };
-    X_Y block_size = { 10,10 };
+    std::cout << "Input, X window size >= 600 and Y window size >= 600, through Enter\nStock 600 x 600\n";
+    int x, y;
+    std::cin >> x >> y;
+    if (x < 600) 
+        x = 600;
+    if (y < 600)
+        y = 600;
+    X_Y window_size = { x,y };
+    std::cout << "Input, X block size and Y block size through Enter\nStock 10 x 10\n";
+    std::cin >> x >> y;
+    if (x < 1)
+        x = 1;
+    if (y < 1)
+        y = 1;
+    X_Y block_size = { x,y };
     sf::RenderWindow window(sf::VideoMode(window_size.x, window_size.y), "Life Game");
     window.setFramerateLimit(5);
     sf::RectangleShape shape(sf::Vector2f(block_size.x, block_size.y));
@@ -28,8 +41,8 @@ int main()
     font.loadFromFile("font.ttf");
     sf::Text Count;
     Count.setFont(font);
-    Count.setString("\"SPACE\" - pause(Draw Mode)\n\"Left Mouse Button\" - Delite block\n\"Right Mouse Button\" - Create block\n\"R\" - Restart\n\"C\" - Clear");
-    Count.setCharacterSize(40);
+    Count.setString("\"SPACE\" - pause(Draw Mode)\n\"Left Mouse Button\" - Delite block\n\"Right Mouse Button\" - Create block\n\"R\" - Restart\n\"C\" - Clear\n\"G\" -  Off grid");
+    Count.setCharacterSize(25);
     Count.setPosition(window_size.x / 2-250, window_size.y / 2-150);
     Count.setStyle(sf::Text::Bold);
     Count.setColor(sf::Color::White);
@@ -53,7 +66,7 @@ int main()
     for (int i = 0; i < lifesT.size(); i++) {
         lifesT[i].resize(window_size.y / block_size.y + 2);
     }
-
+    bool flag_grid = true;
     bool flag_stop = true;
     while (flag_stop && window.isOpen())
     {
@@ -77,8 +90,12 @@ int main()
         {
             if (event.type == sf::Event::Closed)
                 window.close();
+            if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape))
+                window.close();
             if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Space))
                 flag_stop = !flag_stop;
+            if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::G))
+                flag_grid = !flag_grid;
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::C)) {
                 for (int i = 0; i < lifes.size(); i ++) {
                     for (int j = 0; j < lifes[i].size(); j ++) {
@@ -127,13 +144,13 @@ int main()
                     }
                 }
             }
-            if (block_size.y > 3)
+            if (block_size.y > 3 && flag_grid)
             for (int i = 0; i < window_size.x/block_size.x+1; i++) {
                 gridy.setPosition(i * block_size.x-1, 0);
                 window.draw(gridy);
                 
             }
-            if (block_size.x > 3)
+            if (block_size.x > 3 && flag_grid)
             for (int i = 0; i < window_size.y / block_size.y + 1; i++) {
                 gridx.setPosition(0, i * block_size.y - 1);
                 window.draw(gridx);
